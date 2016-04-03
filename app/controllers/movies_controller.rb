@@ -7,8 +7,9 @@ class MoviesController < ApplicationController
   end
 
   def index
-    @all_ratings = Movie.all_ratings
-    # Get the remembered settings
+    @all_ratings = ['G', 'R', 'PG-13', 'PG','NC-17']
+
+    # The logic to fill in session and remember settings
     if (params[:filter] == nil and params[:ratings] == nil and params[:sort] == nil and
       (session[:filter] != nil or session[:ratings] != nil or session[:sort] != nil))
       if (params[:filter] == nil and session[:filter] != nil)
@@ -25,7 +26,7 @@ class MoviesController < ApplicationController
     else
 
 
-      #look at this
+      #fill session if necessary
       if (params[:filter] != nil)
         @myFilter = params[:filter].scan(/[\w-]+/)
         session[:filter] = params[:filter]
@@ -38,23 +39,24 @@ class MoviesController < ApplicationController
         end
 
       end
-
+      #filling in session
       session[:sort] = params[:sort]
       session[:ratings] = params[:ratings]
+      #logic to apply filters
       if (params[:sort] == "title") #TITLE
-        if (params[:ratings] or params[:filter] != "[]") # filter ratings
+        if (params[:ratings] or params[:filter] != "[]")
           @movies = Movie.find(:all, :conditions => {:rating => (@myFilter==[] ? @all_ratings : @myFilter)}, :order => "title")
         else
           @movies = Movie.find(:all, :order => "title")
         end
       elsif (params[:sort] == "release_date") #RELEASE DATE
-        if (params[:ratings] or params[:filter] != "[]") # filter ratings
+        if (params[:ratings] or params[:filter] != "[]")
           @movies = Movie.find(:all, :conditions => {:rating => (@myFilter==[] ? @all_ratings : @myFilter)}, :order => "release_date")
         else
           @movies = Movie.find(:all, :order => "release_date")
         end
       elsif (params[:sort] == nil)
-        if (params[:ratings] or params[:filter] != "[]") # filter ratings
+        if (params[:ratings] or params[:filter] != "[]")
           @movies = Movie.find(:all, :conditions => {:rating => (@myFilter==[] ? @all_ratings : @myFilter)})
         else
           @movies = Movie.all
