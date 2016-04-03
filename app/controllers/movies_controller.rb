@@ -25,38 +25,30 @@ class MoviesController < ApplicationController
     else
 
 
-      #seting session and filter info
+      #look at this
       if (params[:filter] != nil)
         @myFilter = params[:filter].scan(/[\w-]+/)
         session[:filter] = params[:filter]
       else
         if session[:filter].nil?
-          if params[:ratings]
-            @myFilter = params[:ratings].keys
-          else
-            @myFilter = all_ratings
-          end
+          @myFilter = params[:ratings] ? params[:ratings].keys : @all_ratings
           session[:ratings] = params[:ratings]
         else
-          if params[:ratings]
-            @myFilter = params[:ratings].keys
-          else
-            @myFilter = session[:filter]
-          end
+          @myFilter = params[:ratings] ? params[:ratings].keys : session[:filter]
         end
 
       end
 
-      session[:ratings] = params[:ratings]
       session[:sort] = params[:sort]
+      session[:ratings] = params[:ratings]
       if (params[:sort] == "title") #TITLE
-        if (params[:ratings] or params[:filter] != "[]") 
+        if (params[:ratings] or params[:filter] != "[]") # filter ratings
           @movies = Movie.find(:all, :conditions => {:rating => (@myFilter==[] ? @all_ratings : @myFilter)}, :order => "title")
         else
           @movies = Movie.find(:all, :order => "title")
         end
       elsif (params[:sort] == "release_date") #RELEASE DATE
-        if (params[:ratings] or params[:filter] != "[]") 
+        if (params[:ratings] or params[:filter] != "[]") # filter ratings
           @movies = Movie.find(:all, :conditions => {:rating => (@myFilter==[] ? @all_ratings : @myFilter)}, :order => "release_date")
         else
           @movies = Movie.find(:all, :order => "release_date")
